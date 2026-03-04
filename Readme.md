@@ -46,7 +46,7 @@ MCP Client
 │       └── rag_server.py
 │
 ├── data
-│   └── telemetry / logs / metrics files
+│   └──  logs / metrics files
 │
 ├── fastapibackend.py
 ├── frontend_mcp.py
