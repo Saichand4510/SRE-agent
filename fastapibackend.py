@@ -4,7 +4,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import json
 from langchain_core.messages import HumanMessage, AIMessage
-
+import threading
+from log_generator import main as start_log_generator
+from metrics_generator import main as start_metrics_generator
 from langgraph_mcp_backend1 import (
     create_chatbot,
     retrieve_all_threads,
@@ -18,7 +20,19 @@ chatbot = None
 @app.on_event("startup")
 async def startup_event():
     global chatbot
+
+    # Initialize chatbot
     chatbot = await create_chatbot()
+
+    # Start log generator
+    log_thread = threading.Thread(target=start_log_generator)
+    log_thread.daemon = True
+    log_thread.start()
+
+    # Start metrics generator
+    metrics_thread = threading.Thread(target=start_metrics_generator)
+    metrics_thread.daemon = True
+    metrics_thread.start()
 # =========================
 # Request / Response Models
 # =========================
