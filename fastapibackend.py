@@ -101,14 +101,14 @@ async def startup_event():
     chatbot = await create_chatbot()
 
     # Start log generator
-    # log_thread = threading.Thread(target=start_log_generator)
-    # log_thread.daemon = True
-    # log_thread.start()
+    log_thread = threading.Thread(target=start_log_generator)
+    log_thread.daemon = True
+    log_thread.start()
 
-    # # Start metrics generator
-    # metrics_thread = threading.Thread(target=start_metrics_generator)
-    # metrics_thread.daemon = True
-    # metrics_thread.start()
+    # Start metrics generator
+    metrics_thread = threading.Thread(target=start_metrics_generator)
+    metrics_thread.daemon = True
+    metrics_thread.start()
     
     create_tables()   
 # =========================
