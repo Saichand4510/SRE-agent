@@ -5,7 +5,7 @@ import json
 # =========================
 # Config
 # =========================
-API_BASE = "http://127.0.0.1:8000"
+API_BASE = "https://sre-agent-wz1n.onrender.com"
 
 # 🔐 AUTH HELPERS (NEW)
 # =========================

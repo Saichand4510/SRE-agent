@@ -53,7 +53,7 @@ def maybe_trigger_spike():
     if not SPIKE_ACTIVE and random.random() < SPIKE_PROBABILITY:
         SPIKE_ACTIVE = True
         SPIKE_END_TIME = now + SPIKE_DURATION_SEC
-        print("🚨 ERROR SPIKE STARTED!")
+       # print("🚨 ERROR SPIKE STARTED!")
 def generate_log():
     """Generate normal or spike log."""
 
@@ -88,12 +88,12 @@ def safe_load_logs():
             content = f.read().strip()
             return json.loads(content) if content else []
     except json.JSONDecodeError:
-        print("⚠️ Corrupted JSON detected — resetting")
+        #print("⚠️ Corrupted JSON detected — resetting")
         return []
 
 
 def main():
-    print("🚀 Log generator started...")
+    #print("🚀 Log generator started...")
 
     while True:
         maybe_trigger_spike()
@@ -108,14 +108,14 @@ def main():
         # ✅ ROLLING WINDOW
         if len(data) > MAX_LOGS:
             data = data[-MAX_LOGS:]
-            print("♻️ Rolling window applied")
+            #print("♻️ Rolling window applied")
 
         # ✅ SAFE WRITE
         with open(LOGS_PATH, "w") as f:
             json.dump(data, f, indent=2)
             f.flush()
 
-        print("Added log:", log_entry)
+        #print("Added log:", log_entry)
 
         time.sleep(3)
 

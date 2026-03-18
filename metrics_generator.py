@@ -44,7 +44,7 @@ def safe_load():
 
 
 def main():
-    print("📊 Metrics generator started...")
+    #print("📊 Metrics generator started...")
 
     while True:
         data = safe_load()
@@ -60,7 +60,7 @@ def main():
         with open(METRICS_PATH, "w") as f:
             json.dump(data, f, indent=2)
 
-        print("Updated metrics")
+       # print("Updated metrics")
         time.sleep(10)
 
 
