@@ -154,19 +154,3 @@ async def create_chatbot():
     chatbot = graph.compile(checkpointer=checkpointer)
     return chatbot
 
-# ============================================================
-# 7️⃣ THREAD LISTING
-# ============================================================
-
-async def _alist_threads():
-    if checkpointer is None:
-        return []
-
-    all_threads = set()
-    async for checkpoint in checkpointer.alist(None):
-        all_threads.add(checkpoint.config["configurable"]["thread_id"])
-    return list(all_threads)
-
-
-async def retrieve_all_threads():
-    return await _alist_threads()
