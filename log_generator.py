@@ -47,7 +47,7 @@ def maybe_trigger_spike():
     # end spike if expired
     if SPIKE_ACTIVE and now > SPIKE_END_TIME:
         SPIKE_ACTIVE = False
-        print("✅ Spike ended — back to normal")
+       # print("✅ Spike ended — back to normal")
 
     # randomly start spike
     if not SPIKE_ACTIVE and random.random() < SPIKE_PROBABILITY:
