@@ -49,7 +49,7 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Request: {request.method} {request.url}")
 
     response = await call_next(request)
-
+    print("Inside logger")
     logger.info(f"Response: {response.status_code}")
 
     return response
@@ -393,6 +393,6 @@ async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get
             }) + "\n"
 
     return StreamingResponse(event_generator(), media_type="text/plain")
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok"}
