@@ -25,4 +25,4 @@ COPY . .
 EXPOSE 8000
 
 # Run FastAPI (production ready)
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "fastapibackend:app", "--bind", "0.0.0.0:8000"]
+CMD ["uvicorn", "fastapibackend:app", "--host", "0.0.0.0", "--port", "8000"]
