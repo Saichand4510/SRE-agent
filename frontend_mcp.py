@@ -5,7 +5,7 @@ import json
 # =========================
 # Config
 # =========================
-API_BASE = "https://sre-agent-wz1n.onrender.com"
+API_BASE = "http://127.0.0.1:8000"
 
 # 🔐 AUTH HELPERS (NEW)
 # =========================
@@ -65,7 +65,7 @@ def handle_response(r):
 
     # 🔥 500+ - Server Error
     elif r.status_code >= 500:
-        st.error("Server error. Please try again later.")
+        st.error(data.get("detail","Server error. Please try again later."))
     
 
     # ❓ Any other unexpected
@@ -104,7 +104,6 @@ def load_conversation_api(thread_id):
     data = handle_response(r)
     if "detail" in  data:
         return []
-
     return data["messages"]
 
 
@@ -233,6 +232,7 @@ st.sidebar.header("My Conversations")
 for thread_id in st.session_state["chat_threads"][::-1]:
     if st.sidebar.button(str(thread_id)):
         st.session_state["thread_id"] = thread_id
+        st.session_state["message_history"]=[]
         messages = load_conversation_api(thread_id)
         
         st.session_state["message_history"] = messages

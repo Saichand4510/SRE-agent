@@ -1,602 +1,602 @@
 [
   {
-    "timestamp": "2026-03-17T04:58:39",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T04:58:42",
+    "timestamp": "2026-03-20T10:49:19",
     "service": "order-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T04:58:45",
-    "service": "user-api",
     "level": "WARN",
-    "message": "High response latency detected"
+    "message": "Connection pool nearing capacity"
   },
   {
-    "timestamp": "2026-03-17T04:58:48",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T04:58:51",
+    "timestamp": "2026-03-20T10:49:22",
     "service": "user-api",
-    "level": "WARN",
-    "message": "Retrying failed request"
+    "level": "ERROR",
+    "message": "User session validation failed"
   },
   {
-    "timestamp": "2026-03-17T04:58:54",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T04:58:57",
+    "timestamp": "2026-03-20T10:49:25",
     "service": "order-api",
     "level": "ERROR",
     "message": "Failed to reserve inventory"
   },
   {
-    "timestamp": "2026-03-17T04:59:01",
+    "timestamp": "2026-03-20T10:49:28",
+    "service": "order-api",
+    "level": "WARN",
+    "message": "Retrying failed request"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:31",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:34",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:37",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Connection pool exhausted"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:40",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:43",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:46",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:49",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:52",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "Failed to reserve inventory"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:55",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:49:58",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Database connection timeout"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:01",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:04",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:07",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Failed to reserve inventory"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:10",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "User session validation failed"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:13",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "Failed to reserve inventory"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:16",
+    "service": "order-api",
+    "level": "WARN",
+    "message": "Retrying failed request"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:20",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Database connection timeout"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:23",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:26",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "Failed to reserve inventory"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:29",
     "service": "payment-api",
     "level": "ERROR",
     "message": "Database connection timeout"
   },
   {
-    "timestamp": "2026-03-17T04:59:04",
-    "service": "user-api",
-    "level": "WARN",
-    "message": "Connection pool nearing capacity"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:07",
-    "service": "user-api",
-    "level": "WARN",
-    "message": "Retrying failed request"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:10",
+    "timestamp": "2026-03-20T10:50:32",
     "service": "payment-api",
+    "level": "ERROR",
+    "message": "User session validation failed"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:35",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "Database connection timeout"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:38",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Database connection timeout"
+  },
+  {
+    "timestamp": "2026-03-20T10:50:41",
+    "service": "user-api",
     "level": "WARN",
     "message": "High response latency detected"
   },
   {
-    "timestamp": "2026-03-17T04:59:13",
-    "service": "payment-api",
-    "level": "ERROR",
-    "message": "Failed to reserve inventory"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:16",
+    "timestamp": "2026-03-20T10:50:44",
     "service": "order-api",
-    "level": "ERROR",
-    "message": "Failed to reserve inventory"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:19",
-    "service": "payment-api",
     "level": "INFO",
     "message": "Operation completed"
   },
   {
-    "timestamp": "2026-03-17T04:59:22",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:25",
+    "timestamp": "2026-03-20T10:50:47",
     "service": "user-api",
-    "level": "INFO",
-    "message": "Operation completed"
+    "level": "ERROR",
+    "message": "Connection pool exhausted"
   },
   {
-    "timestamp": "2026-03-17T04:59:28",
+    "timestamp": "2026-03-20T10:50:50",
     "service": "order-api",
-    "level": "ERROR",
-    "message": "Failed to reserve inventory"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:31",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:34",
-    "service": "payment-api",
     "level": "WARN",
     "message": "Retrying failed request"
   },
   {
-    "timestamp": "2026-03-17T04:59:37",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:40",
+    "timestamp": "2026-03-20T10:50:53",
     "service": "user-api",
-    "level": "ERROR",
-    "message": "Failed to reserve inventory"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:43",
-    "service": "order-api",
     "level": "ERROR",
     "message": "User session validation failed"
   },
   {
-    "timestamp": "2026-03-17T04:59:46",
+    "timestamp": "2026-03-20T10:50:56",
     "service": "user-api",
-    "level": "ERROR",
-    "message": "Failed to reserve inventory"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:49",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T04:59:52",
-    "service": "order-api",
     "level": "WARN",
     "message": "High response latency detected"
   },
   {
-    "timestamp": "2026-03-17T04:59:55",
+    "timestamp": "2026-03-20T10:50:59",
     "service": "user-api",
     "level": "INFO",
     "message": "Operation completed"
   },
   {
-    "timestamp": "2026-03-17T04:59:58",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:01",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:04",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:07",
-    "service": "order-api",
-    "level": "WARN",
-    "message": "Connection pool nearing capacity"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:10",
+    "timestamp": "2026-03-20T10:51:02",
     "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:13",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:16",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:19",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:22",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:25",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:28",
-    "service": "order-api",
-    "level": "WARN",
-    "message": "Connection pool nearing capacity"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:31",
-    "service": "order-api",
-    "level": "ERROR",
-    "message": "Connection pool exhausted"
-  },
-  {
-    "timestamp": "2026-03-17T05:00:34",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:08",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:11",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:14",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:17",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:21",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:24",
-    "service": "payment-api",
-    "level": "WARN",
-    "message": "Connection pool nearing capacity"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:27",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:30",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:33",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:36",
-    "service": "user-api",
     "level": "ERROR",
     "message": "User session validation failed"
   },
   {
-    "timestamp": "2026-03-17T05:02:39",
+    "timestamp": "2026-03-20T10:51:05",
     "service": "order-api",
-    "level": "ERROR",
-    "message": "Connection pool exhausted"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:42",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:45",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:48",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:51",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:54",
-    "service": "user-api",
-    "level": "WARN",
-    "message": "Connection pool nearing capacity"
-  },
-  {
-    "timestamp": "2026-03-17T05:02:57",
-    "service": "user-api",
-    "level": "ERROR",
-    "message": "Connection pool exhausted"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:00",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:03",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:06",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:09",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:12",
-    "service": "user-api",
-    "level": "ERROR",
-    "message": "Connection pool exhausted"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:15",
-    "service": "order-api",
-    "level": "WARN",
-    "message": "Connection pool nearing capacity"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:18",
-    "service": "user-api",
     "level": "WARN",
     "message": "Retrying failed request"
   },
   {
-    "timestamp": "2026-03-17T05:03:21",
+    "timestamp": "2026-03-20T10:51:08",
     "service": "payment-api",
     "level": "ERROR",
     "message": "User session validation failed"
   },
   {
-    "timestamp": "2026-03-17T05:03:24",
-    "service": "user-api",
+    "timestamp": "2026-03-20T10:51:11",
+    "service": "order-api",
     "level": "ERROR",
     "message": "Failed to reserve inventory"
   },
   {
-    "timestamp": "2026-03-17T05:03:27",
+    "timestamp": "2026-03-20T10:51:14",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Connection pool exhausted"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:17",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:20",
     "service": "order-api",
     "level": "INFO",
     "message": "Service heartbeat OK"
   },
   {
-    "timestamp": "2026-03-17T05:03:30",
+    "timestamp": "2026-03-20T10:51:23",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:26",
+    "service": "order-api",
+    "level": "WARN",
+    "message": "Connection pool nearing capacity"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:29",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "Failed to reserve inventory"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:32",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:35",
+    "service": "user-api",
+    "level": "WARN",
+    "message": "High response latency detected"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:38",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:41",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:44",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:47",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:50",
+    "service": "order-api",
+    "level": "WARN",
+    "message": "Retrying failed request"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:53",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:56",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:51:59",
     "service": "order-api",
     "level": "ERROR",
     "message": "Failed to reserve inventory"
   },
   {
-    "timestamp": "2026-03-17T05:03:33",
+    "timestamp": "2026-03-20T10:52:02",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:05",
+    "service": "user-api",
+    "level": "WARN",
+    "message": "Connection pool nearing capacity"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:08",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:11",
+    "service": "payment-api",
+    "level": "WARN",
+    "message": "Retrying failed request"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:14",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:18",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:21",
+    "service": "order-api",
+    "level": "WARN",
+    "message": "Connection pool nearing capacity"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:24",
     "service": "user-api",
     "level": "ERROR",
     "message": "Database connection timeout"
   },
   {
-    "timestamp": "2026-03-17T05:03:36",
+    "timestamp": "2026-03-20T10:52:27",
     "service": "payment-api",
     "level": "INFO",
-    "message": "Request processed successfully"
+    "message": "Service heartbeat OK"
   },
   {
-    "timestamp": "2026-03-17T05:03:39",
-    "service": "order-api",
-    "level": "WARN",
-    "message": "Retrying failed request"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:42",
+    "timestamp": "2026-03-20T10:52:30",
     "service": "user-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
+    "level": "ERROR",
+    "message": "Database connection timeout"
   },
   {
-    "timestamp": "2026-03-17T05:03:45",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:48",
-    "service": "user-api",
-    "level": "WARN",
-    "message": "Retrying failed request"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:51",
-    "service": "payment-api",
-    "level": "WARN",
-    "message": "Connection pool nearing capacity"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:54",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:03:57",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:00",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:03",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Operation completed"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:06",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:10",
+    "timestamp": "2026-03-20T10:52:33",
     "service": "user-api",
     "level": "INFO",
     "message": "Service heartbeat OK"
   },
   {
-    "timestamp": "2026-03-17T05:04:13",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:16",
+    "timestamp": "2026-03-20T10:52:36",
     "service": "user-api",
     "level": "ERROR",
     "message": "User session validation failed"
   },
   {
-    "timestamp": "2026-03-17T05:04:19",
-    "service": "payment-api",
-    "level": "ERROR",
-    "message": "Failed to reserve inventory"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:22",
-    "service": "payment-api",
+    "timestamp": "2026-03-20T10:52:39",
+    "service": "user-api",
     "level": "WARN",
-    "message": "Retrying failed request"
+    "message": "High response latency detected"
   },
   {
-    "timestamp": "2026-03-17T05:04:25",
-    "service": "order-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:28",
-    "service": "payment-api",
+    "timestamp": "2026-03-20T10:52:42",
+    "service": "user-api",
     "level": "ERROR",
     "message": "Connection pool exhausted"
   },
   {
-    "timestamp": "2026-03-17T05:04:31",
+    "timestamp": "2026-03-20T10:52:45",
     "service": "user-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:34",
-    "service": "payment-api",
-    "level": "ERROR",
-    "message": "Connection pool exhausted"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:37",
-    "service": "payment-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:40",
-    "service": "user-api",
-    "level": "ERROR",
-    "message": "Failed to reserve inventory"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:43",
-    "service": "payment-api",
     "level": "WARN",
     "message": "Retrying failed request"
   },
   {
-    "timestamp": "2026-03-17T05:04:46",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:49",
+    "timestamp": "2026-03-20T10:52:48",
     "service": "user-api",
     "level": "INFO",
     "message": "Operation completed"
   },
   {
-    "timestamp": "2026-03-17T05:04:52",
+    "timestamp": "2026-03-20T10:52:51",
     "service": "payment-api",
-    "level": "INFO",
-    "message": "Request processed successfully"
+    "level": "ERROR",
+    "message": "User session validation failed"
   },
   {
-    "timestamp": "2026-03-17T05:04:55",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:04:58",
-    "service": "user-api",
-    "level": "INFO",
-    "message": "Service heartbeat OK"
-  },
-  {
-    "timestamp": "2026-03-17T05:05:01",
+    "timestamp": "2026-03-20T10:52:54",
     "service": "payment-api",
+    "level": "ERROR",
+    "message": "Failed to reserve inventory"
+  },
+  {
+    "timestamp": "2026-03-20T10:52:57",
+    "service": "order-api",
     "level": "WARN",
     "message": "Retrying failed request"
   },
   {
-    "timestamp": "2026-03-17T05:05:04",
+    "timestamp": "2026-03-20T10:53:00",
+    "service": "payment-api",
+    "level": "WARN",
+    "message": "Connection pool nearing capacity"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:03",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Connection pool exhausted"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:06",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:09",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:12",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:15",
+    "service": "order-api",
+    "level": "WARN",
+    "message": "Connection pool nearing capacity"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:18",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:21",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:24",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:27",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:30",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:33",
     "service": "user-api",
     "level": "INFO",
     "message": "Service heartbeat OK"
   },
   {
-    "timestamp": "2026-03-17T05:05:07",
+    "timestamp": "2026-03-20T10:53:36",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:39",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:42",
+    "service": "order-api",
+    "level": "WARN",
+    "message": "Retrying failed request"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:45",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:48",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:51",
+    "service": "order-api",
+    "level": "ERROR",
+    "message": "Database connection timeout"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:54",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T10:53:57",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "Failed to reserve inventory"
+  },
+  {
+    "timestamp": "2026-03-20T10:54:00",
+    "service": "payment-api",
+    "level": "ERROR",
+    "message": "Database connection timeout"
+  },
+  {
+    "timestamp": "2026-03-20T10:54:03",
     "service": "payment-api",
     "level": "INFO",
     "message": "Request processed successfully"
   },
   {
-    "timestamp": "2026-03-17T05:05:10",
-    "service": "user-api",
+    "timestamp": "2026-03-20T10:54:06",
+    "service": "order-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T11:13:12",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Operation completed"
+  },
+  {
+    "timestamp": "2026-03-20T11:14:00",
+    "service": "payment-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
+  },
+  {
+    "timestamp": "2026-03-20T11:17:24",
+    "service": "order-api",
     "level": "INFO",
     "message": "Service heartbeat OK"
+  },
+  {
+    "timestamp": "2026-03-20T11:19:24",
+    "service": "user-api",
+    "level": "INFO",
+    "message": "Request processed successfully"
   }
 ]

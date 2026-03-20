@@ -11,7 +11,9 @@ from langgraph_mcp_backend1 import (
     create_chatbot
    
 )
-from database import create_tables,get_connection
+from database import create_tables,init_db,close_db
+import database
+from asyncpg.exceptions import UniqueViolationError
 from auth import hash_password,verify_password, create_token
 from auth import get_current_user
 from fastapi import Depends
@@ -23,6 +25,8 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 import logging
 from fastapi.middleware.cors import CORSMiddleware
+import os
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 logging.basicConfig(
     level=logging.INFO,
@@ -107,8 +111,7 @@ chatbot = None
 async def startup_event():
     global chatbot
 
-    # Initialize chatbot
-    chatbot = await create_chatbot()
+    
 
     # Start log generator
     log_thread = threading.Thread(target=start_log_generator)
@@ -120,7 +123,22 @@ async def startup_event():
     metrics_thread.daemon = True
     metrics_thread.start()
     
-    create_tables()   
+    app.state.checkpointer_cm = AsyncPostgresSaver.from_conn_string(
+        os.getenv("DATABASE_URL")
+    )
+    print(1)
+    app.state.checkpointer = await app.state.checkpointer_cm.__aenter__()
+
+    # ✅ create chatbot
+    chatbot = await create_chatbot(app.state.checkpointer)
+
+    await init_db()          # ✅ initialize pool
+    await create_tables()    # ✅ create schema   
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await close_db()    
+    await app.state.checkpointer_cm.__aexit__(None, None, None)
 # =========================
 # Request / Response Models
 # =========================
@@ -165,122 +183,110 @@ def get_config(thread_id: str):
         "run_name": "chat_turn",
     }
 
-def _normalize_content(content):
-    """Convert LangChain content blocks to plain text."""
-    if isinstance(content, str):
-        return content
 
-    if isinstance(content, list):
-        parts = []
-        for block in content:
-            if isinstance(block, dict):
-                parts.append(block.get("text", ""))
-            else:
-                parts.append(str(block))
-        return "".join(parts)
 
-    return str(content)
-def check_thread_owner(thread_id: str, user: str):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT username FROM threads WHERE thread_id = %s",
-        (thread_id,)
-    )
-
-    result = cursor.fetchone()
-    conn.close()
+async def check_thread_owner(thread_id: str, user: str) -> bool:
+    async with database.pool.acquire() as conn:
+        result = await conn.fetchrow(
+            "SELECT username FROM threads WHERE thread_id = $1",
+            thread_id
+        )
 
     if not result:
         return False
 
-    return result[0] == user
+    return result["username"] == user
+
 @app.post("/signup")
 @limiter.limit("5/minute", key_func=get_remote_address)
-async def signup(request:Request,user: UserSignup):
-    try:
-        logger.info(f"Signup attempt: {user.username}")
-        conn = get_connection()
-        cursor = conn.cursor()
+async def signup(request: Request, user: UserSignup):
+    logger.info(f"Signup attempt: {user.username}")
 
-        cursor.execute(
-            "INSERT INTO users (username, password) VALUES (%s, %s)",
-            (user.username, hash_password(user.password))
-        )
-        conn.commit()
-        conn.close()
-        logger.info(f"User created: {user.username}")
-        return {"message": "User created"}
+    async with database.pool.acquire() as conn:
+        try:
+            await conn.execute(
+                "INSERT INTO users (username, password) VALUES ($1, $2)",
+                user.username,
+                hash_password(user.password)
+            )
 
-    except Exception:
-        logger.warning(f"Signup failed (user exists): {user.username}")
-        raise HTTPException(status_code=400, detail="User already exists")
+            logger.info(f"User created: {user.username}")
+            return {"message": "User created"}
+
+        except UniqueViolationError:
+            logger.warning(f"Signup failed (user exists): {user.username}")
+            raise HTTPException(status_code=400, detail="User already exists")
+
+        except Exception as e:
+            logger.error(f"Signup error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Signup failed")
+
 
 
 @app.post("/login")
 @limiter.limit("5/minute", key_func=get_remote_address)
-async def login(request:Request,user: UserLogin):
-    try:
-        logger.info(f"Login attempt: {user.username}")
-        conn = get_connection()
-        cursor = conn.cursor()
+async def login(request: Request, user: UserLogin):
+    logger.info(f"Login attempt: {user.username}")
 
-        cursor.execute(
-            "SELECT password FROM users WHERE username = %s",
-            (user.username,)
-        )
-        result = cursor.fetchone()
-        conn.close()
+    async with database.pool.acquire() as conn:
+        try:
+            result = await conn.fetchrow(
+                "SELECT password FROM users WHERE username=$1",
+                user.username
+            )
 
-        if not result:
-            logger.warning(f"User not found: {user.username}")
-            raise HTTPException(status_code=404, detail="User not found")
+            if not result:
+                logger.warning(f"User not found: {user.username}")
+                raise HTTPException(status_code=404, detail="User not found")
 
-        stored_password = result[0]
+            stored_password = result["password"]
 
-        if not verify_password(user.password, stored_password):
-            logger.warning(f"Invalid password for user: {user.username}")
-            raise HTTPException(status_code=401, detail="Invalid password")
+            if not verify_password(user.password, stored_password):
+                logger.warning(f"Invalid password attempt for user: {user.username}")
+                raise HTTPException(status_code=401, detail="Invalid password")
 
-        token = create_token(user.username)
-        logger.info(f"User logged in: {user.username}")
-        return {"access_token": token}
+            token = create_token(user.username)
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Login error:{str(e)} ")
-        raise HTTPException(status_code=500, detail="Login failed")  
+            logger.info(f"User logged in: {user.username}")
+            return {"access_token": token}
+
+        except HTTPException:
+            raise
+
+        except Exception as e:
+            logger.error(f"Login error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Login failed")
 # =========================
 # 1️⃣ Create new chat
 # =========================
 
+
 @app.post("/threads")
 @limiter.limit("4/minute")
-async def create_thread(request:Request,user: str = Depends(get_current_user)):
+async def create_thread(request: Request, user: str = Depends(get_current_user)):
+    logger.info(f"Creating thread for user: {user}")
+
+    thread_id = generate_thread_id()
+
     try:
-        logger.info(f"Creating thread for user: {user}")
-        thread_id = generate_thread_id()
-         
-        conn = get_connection()
-        cursor = conn.cursor()
+        # ✅ DB insert (async + pooled)
+        async with database.pool.acquire() as conn:
+            await conn.execute(
+                "INSERT INTO threads (thread_id, username) VALUES ($1, $2)",
+                thread_id,
+                user
+            )
 
-        cursor.execute(
-            "INSERT INTO threads (thread_id, username) VALUES (%s, %s)",
-            (thread_id, user)
-        )
-
-        conn.commit()
-        conn.close()
         logger.info(f"Thread created: {thread_id}")
+
+        # ✅ Initialize chatbot state (non-blocking)
         await chatbot.ainvoke(
             {"messages": []},
             config=get_config(thread_id),
         )
 
         return ThreadResponse(thread_id=thread_id)
-    
+
     except Exception as e:
         logger.error(f"Thread creation failed: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create thread")
@@ -290,24 +296,22 @@ async def create_thread(request:Request,user: str = Depends(get_current_user)):
 # 2️⃣ List threads
 # =========================
 
+
 @app.get("/threads")
 @limiter.limit("2/minute")
-async def list_threads(request:Request,user: str = Depends(get_current_user)):
+async def list_threads(request: Request, user: str = Depends(get_current_user)):
+    logger.info(f"Fetching threads for user: {user}")
+
     try:
-        logger.info(f"Fetching threads for user: {user}")
-        conn = get_connection()
-        cursor = conn.cursor()
+        async with database.pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT thread_id FROM threads WHERE username = $1",
+                user
+            )
 
-        cursor.execute(
-            "SELECT thread_id FROM threads WHERE username = %s",
-            (user,)
-        )
-
-        threads = [row[0] for row in cursor.fetchall()]
-        conn.close()
+        threads = [row["thread_id"] for row in rows]
 
         return {"threads": threads}
-   
 
     except Exception as e:
         logger.error(f"Fetch threads error: {str(e)}")
@@ -323,7 +327,7 @@ async def list_threads(request:Request,user: str = Depends(get_current_user)):
 async def get_thread_messages(request:Request,thread_id: str, user: str = Depends(get_current_user)):
     try:
         logger.info(f"Fetching messages for thread: {thread_id} by user: {user}")
-        if not check_thread_owner(thread_id, user):
+        if not await check_thread_owner(thread_id, user):
             logger.warning(f"Unauthorized access attempt: {thread_id} by {user}")
             raise HTTPException(status_code=403, detail="Not allowed")
 
@@ -360,7 +364,7 @@ async def get_thread_messages(request:Request,thread_id: str, user: str = Depend
 @app.post("/chat/stream")
 @limiter.limit("8/minute")
 async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get_current_user)):
-    if not check_thread_owner(body.thread_id, user):
+    if not await check_thread_owner(body.thread_id, user):
         logger.warning(f"Unauthorized chat access: {body.thread_id} by {user}")
         raise HTTPException(status_code=403, detail="Not allowed")
 

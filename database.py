@@ -1,29 +1,42 @@
-import psycopg2
+import asyncpg
 import os
 
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-def get_connection():
-    
-    return psycopg2.connect(os.getenv("DATABASE_URL"))
+pool = None
 
-def create_tables():
-    conn = get_connection()
-    cursor = conn.cursor()
+async def init_db():
+    global pool
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username TEXT UNIQUE,
-        password TEXT
+    pool = await asyncpg.create_pool(
+        DATABASE_URL,
+        min_size=2,
+        max_size=10,
+        timeout=30
     )
-    """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS threads (
-        thread_id TEXT PRIMARY KEY,
-        username TEXT
-    )
-    """)
+async def close_db():
+    await pool.close()
 
-    conn.commit()
-    conn.close()
+async def create_tables():
+    async with pool.acquire() as conn:
+        await conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+        """)
+
+        await conn.execute("""
+        CREATE TABLE IF NOT EXISTS threads (
+            thread_id TEXT PRIMARY KEY,
+            username TEXT NOT NULL
+        )
+        """)
+        await conn.execute("""
+        CREATE TABLE IF NOT EXISTS chatbot_state (
+          thread_id TEXT PRIMARY KEY,
+          state JSONB
+        )
+        """)

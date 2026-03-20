@@ -850,3 +850,128 @@
 2026-03-18 19:39:51,880 | INFO | Response: 422
 2026-03-18 19:41:26,553 | INFO | Request: POST http://127.0.0.1:8000/chat/stream
 2026-03-18 19:41:26,557 | INFO | Response: 422
+2026-03-19 18:19:14,588 | INFO | Request: POST http://127.0.0.1:8000/login
+2026-03-19 18:19:14,623 | INFO | Login attempt: kiran
+2026-03-19 18:19:15,843 | INFO | User logged in: kiran
+2026-03-19 18:19:15,845 | INFO | Response: 200
+2026-03-19 18:19:15,897 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 18:19:15,906 | INFO | Creating thread for user: kiran
+2026-03-19 18:19:18,290 | INFO | Thread created: 2a3bb0ea-9192-42f9-9721-c182ed142e6b
+2026-03-19 18:19:23,929 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-03-19 18:19:24,081 | ERROR | Thread creation failed: Error code: 503 - {'error': {'message': 'openai/gpt-oss-120b is currently over capacity. Please try again and back off exponentially. Visit https://groqstatus.com to see if there is an active incident.', 'type': 'internal_server_error'}}
+2026-03-19 18:19:24,082 | INFO | Response: 500
+2026-03-19 18:19:24,090 | INFO | Request: GET http://127.0.0.1:8000/threads
+2026-03-19 18:19:24,095 | INFO | Fetching threads for user: kiran
+2026-03-19 18:19:24,846 | INFO | Response: 200
+2026-03-19 18:19:55,888 | INFO | Request: POST http://127.0.0.1:8000/signup
+2026-03-19 18:19:55,894 | INFO | Signup attempt: padma
+2026-03-19 18:19:57,023 | INFO | User created: padma
+2026-03-19 18:19:57,024 | INFO | Response: 200
+2026-03-19 18:20:00,399 | INFO | Request: POST http://127.0.0.1:8000/login
+2026-03-19 18:20:00,402 | INFO | Login attempt: padma
+2026-03-19 18:20:02,318 | INFO | User logged in: padma
+2026-03-19 18:20:02,319 | INFO | Response: 200
+2026-03-19 18:20:02,363 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 18:20:02,366 | INFO | Creating thread for user: padma
+2026-03-19 18:20:03,546 | INFO | Thread created: 81ff7720-92bc-425f-82d0-3e118a42817b
+2026-03-19 18:20:08,781 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-03-19 18:20:08,806 | ERROR | Thread creation failed: Error code: 503 - {'error': {'message': 'openai/gpt-oss-120b is currently over capacity. Please try again and back off exponentially. Visit https://groqstatus.com to see if there is an active incident.', 'type': 'internal_server_error'}}
+2026-03-19 18:20:08,806 | INFO | Response: 500
+2026-03-19 18:20:08,814 | INFO | Request: GET http://127.0.0.1:8000/threads
+2026-03-19 18:20:08,818 | INFO | Fetching threads for user: padma
+2026-03-19 18:20:09,586 | INFO | Response: 200
+2026-03-19 18:22:34,196 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 18:22:34,217 | INFO | Creating thread for user: padma
+2026-03-19 18:22:35,097 | INFO | Thread created: d50ea852-a81d-4ac3-a3ad-265de9b5a350
+2026-03-19 18:22:40,560 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-03-19 18:22:40,607 | ERROR | Thread creation failed: Error code: 503 - {'error': {'message': 'openai/gpt-oss-120b is currently over capacity. Please try again and back off exponentially. Visit https://groqstatus.com to see if there is an active incident.', 'type': 'internal_server_error'}}
+2026-03-19 18:22:40,609 | INFO | Response: 500
+2026-03-19 19:19:01,214 | INFO | Request: POST http://127.0.0.1:8000/login
+2026-03-19 19:19:01,221 | INFO | Login attempt: test
+2026-03-19 19:19:02,408 | INFO | User logged in: test
+2026-03-19 19:19:02,409 | INFO | Response: 200
+2026-03-19 19:19:02,444 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 19:19:02,448 | INFO | Creating thread for user: test
+2026-03-19 19:19:03,290 | INFO | Thread created: 2306cdb4-38d9-4aef-a7b1-cbdac9783d5c
+2026-03-19 19:19:04,100 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 19:19:04,630 | INFO | Response: 200
+2026-03-19 19:19:04,640 | INFO | Request: GET http://127.0.0.1:8000/threads
+2026-03-19 19:19:04,646 | INFO | Fetching threads for user: test
+2026-03-19 19:19:06,629 | INFO | Response: 200
+2026-03-19 19:19:32,798 | INFO | Request: POST http://127.0.0.1:8000/chat/stream
+2026-03-19 19:19:33,563 | INFO | Chat request from user: test on thread: 2306cdb4-38d9-4aef-a7b1-cbdac9783d5c
+2026-03-19 19:19:33,565 | INFO | Response: 200
+2026-03-19 19:19:33,791 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 19:19:51,142 | INFO | Request: POST http://127.0.0.1:8000/signup
+2026-03-19 19:19:51,149 | INFO | Signup attempt: teja
+2026-03-19 19:19:52,379 | INFO | User created: teja
+2026-03-19 19:19:52,379 | INFO | Response: 200
+2026-03-19 19:19:56,605 | INFO | Request: POST http://127.0.0.1:8000/login
+2026-03-19 19:19:56,609 | INFO | Login attempt: teja
+2026-03-19 19:19:57,636 | INFO | User logged in: teja
+2026-03-19 19:19:57,637 | INFO | Response: 200
+2026-03-19 19:19:57,697 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 19:19:57,699 | INFO | Creating thread for user: teja
+2026-03-19 19:19:58,594 | INFO | Thread created: 366df28e-03f8-4e66-b6c8-a5de9271751f
+2026-03-19 19:19:58,927 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 19:20:02,180 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 19:20:02,196 | INFO | Response: 200
+2026-03-19 19:20:02,203 | INFO | Request: GET http://127.0.0.1:8000/threads
+2026-03-19 19:20:02,206 | INFO | Fetching threads for user: teja
+2026-03-19 19:20:04,222 | INFO | Response: 200
+2026-03-19 19:21:12,959 | INFO | Request: POST http://127.0.0.1:8000/chat/stream
+2026-03-19 19:21:15,068 | INFO | Chat request from user: teja on thread: 366df28e-03f8-4e66-b6c8-a5de9271751f
+2026-03-19 19:21:15,070 | INFO | Response: 200
+2026-03-19 19:21:15,262 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 20:45:30,665 | INFO | Request: POST http://127.0.0.1:8000/login
+2026-03-19 20:45:30,744 | INFO | Login attempt: test
+2026-03-19 20:45:32,064 | INFO | User logged in: test
+2026-03-19 20:45:32,067 | INFO | Response: 200
+2026-03-19 20:45:32,114 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 20:45:32,121 | INFO | Creating thread for user: test
+2026-03-19 20:45:33,050 | INFO | Thread created: fe2801eb-3c23-4214-8156-95b96c7d9ec7
+2026-03-19 20:45:33,676 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 20:45:33,720 | INFO | Response: 200
+2026-03-19 20:45:33,725 | INFO | Request: GET http://127.0.0.1:8000/threads
+2026-03-19 20:45:33,727 | INFO | Fetching threads for user: test
+2026-03-19 20:45:34,464 | INFO | Response: 200
+2026-03-19 20:45:41,216 | INFO | Request: POST http://127.0.0.1:8000/chat/stream
+2026-03-19 20:45:43,197 | INFO | Chat request from user: test on thread: fe2801eb-3c23-4214-8156-95b96c7d9ec7
+2026-03-19 20:45:43,200 | INFO | Response: 200
+2026-03-19 20:45:43,388 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 20:45:45,257 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 20:45:45,260 | INFO | Creating thread for user: test
+2026-03-19 20:45:47,364 | INFO | Thread created: 09f3413e-8783-477f-a514-dae9a7c6ea7f
+2026-03-19 20:45:47,682 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 20:45:47,696 | INFO | Response: 200
+2026-03-19 20:45:50,013 | INFO | Request: GET http://127.0.0.1:8000/threads/09f3413e-8783-477f-a514-dae9a7c6ea7f
+2026-03-19 20:45:50,021 | INFO | Fetching messages for thread: 09f3413e-8783-477f-a514-dae9a7c6ea7f by user: test
+2026-03-19 20:45:50,882 | INFO | Response: 200
+2026-03-19 20:45:55,591 | INFO | Request: GET http://127.0.0.1:8000/threads/fe2801eb-3c23-4214-8156-95b96c7d9ec7
+2026-03-19 20:45:55,595 | INFO | Fetching messages for thread: fe2801eb-3c23-4214-8156-95b96c7d9ec7 by user: test
+2026-03-19 20:45:56,490 | INFO | Response: 200
+2026-03-19 20:46:02,797 | INFO | Request: GET http://127.0.0.1:8000/threads/09f3413e-8783-477f-a514-dae9a7c6ea7f
+2026-03-19 20:46:02,800 | INFO | Fetching messages for thread: 09f3413e-8783-477f-a514-dae9a7c6ea7f by user: test
+2026-03-19 20:46:03,762 | INFO | Response: 200
+2026-03-19 20:46:05,253 | INFO | Request: GET http://127.0.0.1:8000/threads/fe2801eb-3c23-4214-8156-95b96c7d9ec7
+2026-03-19 20:46:05,256 | INFO | Fetching messages for thread: fe2801eb-3c23-4214-8156-95b96c7d9ec7 by user: test
+2026-03-19 20:46:06,021 | INFO | Response: 200
+2026-03-19 20:46:20,154 | INFO | Request: POST http://127.0.0.1:8000/threads
+2026-03-19 20:46:20,157 | INFO | Creating thread for user: test
+2026-03-19 20:46:21,102 | INFO | Thread created: 5bdd48d6-093f-43b5-bd06-0bf6dfc34b52
+2026-03-19 20:46:21,587 | INFO | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-19 20:46:21,600 | INFO | Response: 200
+2026-03-19 20:46:26,313 | INFO | Request: GET http://127.0.0.1:8000/threads/09f3413e-8783-477f-a514-dae9a7c6ea7f
+2026-03-19 20:46:26,318 | WARNING | ratelimit 2 per 1 minute (test) exceeded at endpoint: /threads/09f3413e-8783-477f-a514-dae9a7c6ea7f
+2026-03-19 20:46:26,321 | INFO | Response: 429
+2026-03-19 20:46:30,152 | INFO | Request: GET http://127.0.0.1:8000/threads/5bdd48d6-093f-43b5-bd06-0bf6dfc34b52
+2026-03-19 20:46:30,154 | INFO | Fetching messages for thread: 5bdd48d6-093f-43b5-bd06-0bf6dfc34b52 by user: test
+2026-03-19 20:46:31,066 | INFO | Response: 200
+2026-03-19 20:46:33,435 | INFO | Request: GET http://127.0.0.1:8000/threads/fe2801eb-3c23-4214-8156-95b96c7d9ec7
+2026-03-19 20:46:33,438 | WARNING | ratelimit 2 per 1 minute (test) exceeded at endpoint: /threads/fe2801eb-3c23-4214-8156-95b96c7d9ec7
+2026-03-19 20:46:33,439 | INFO | Response: 429
+2026-03-19 20:46:35,362 | INFO | Request: GET http://127.0.0.1:8000/threads/5bdd48d6-093f-43b5-bd06-0bf6dfc34b52
+2026-03-19 20:46:35,365 | INFO | Fetching messages for thread: 5bdd48d6-093f-43b5-bd06-0bf6dfc34b52 by user: test
+2026-03-19 20:46:37,346 | INFO | Response: 200
+2026-03-19 20:49:15,571 | INFO | Request: POST http://127.0.0.1:8000/login
+2026-03-19 20:49:15,582 | INFO | Login attempt: test

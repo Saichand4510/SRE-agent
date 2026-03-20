@@ -1,13 +1,13 @@
 from typing import TypedDict, Annotated, List
 import os
-import aiosqlite
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from dotenv import load_dotenv
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
-from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+
 
 from langchain_core.messages import (
     BaseMessage,
@@ -62,7 +62,6 @@ client = MultiServerMCPClient(
 
 tools: List[BaseTool] = []
 llm_with_tools = llm
-checkpointer: AsyncSqliteSaver | None = None
 chatbot = None
 
 # ============================================================
@@ -114,7 +113,7 @@ RULES:
 # 6️⃣ CHATBOT FACTORY (CALLED BY FASTAPI STARTUP)
 # ============================================================
 
-async def create_chatbot():
+async def create_chatbot(checkpointer):
     """
     Initializes:
     - MCP tools
@@ -123,7 +122,7 @@ async def create_chatbot():
     - LangGraph
     """
 
-    global tools, llm_with_tools, checkpointer, chatbot
+    global tools, llm_with_tools,  chatbot
 
     # ✅ Load MCP tools
     try:
@@ -133,11 +132,7 @@ async def create_chatbot():
 
     # ✅ Bind tools to LLM
     llm_with_tools = llm.bind_tools(tools)
-
-    # ✅ Initialize SQLite checkpointer
-    conn = await aiosqlite.connect(database="chatbot.db")
-    checkpointer = AsyncSqliteSaver(conn)
-
+   
     # ✅ Build graph
     graph = StateGraph(ChatState)
     graph.add_node("chat_node", chat_node)
