@@ -22,6 +22,7 @@ from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 import logging
+from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,6 +40,15 @@ logger = logging.getLogger(__name__)
 
 
 app = FastAPI(title="LangGraph MCP API")
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 def get_user_key(request):
     return getattr(request.state, "user", "anonymous")
 limiter = Limiter(key_func=get_user_key)
