@@ -130,8 +130,9 @@ async def startup_event():
     app.state.checkpointer = await app.state.checkpointer_cm.__aenter__()
 
     # ✅ create chatbot
+    await app.state.checkpointer.setup()
     chatbot = await create_chatbot(app.state.checkpointer)
-
+    print("insdie start up event")
     await init_db()          # ✅ initialize pool
     await create_tables()    # ✅ create schema   
 
