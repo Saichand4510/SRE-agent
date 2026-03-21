@@ -49,7 +49,7 @@ app = FastAPI(title="LangGraph MCP API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or specify your frontend URL
+    allow_origins=["https://8e5a7f93d36f470aa88fb46b36c41077-main.builderio.xyz"],  # Or specify your frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
