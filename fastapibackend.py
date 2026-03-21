@@ -49,7 +49,9 @@ app = FastAPI(title="LangGraph MCP API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://8e5a7f93d36f470aa88fb46b36c41077-main.builderio.xyz"],  # Or specify your frontend URL
+    allow_origins=["https://sre-agent-1.onrender.com",
+    "https://65c3084a-9eb6-4ac7-84a6-497dd1423b2f.lovableproject.com",
+    "https://id-preview--65c3084a-9eb6-4ac7-84a6-497dd1423b2f.lovable.app"],  # Or specify your frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
