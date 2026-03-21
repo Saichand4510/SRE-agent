@@ -14,7 +14,7 @@ from langgraph_mcp_backend1 import (
 from database import create_tables,init_db,close_db
 import database
 from asyncpg.exceptions import UniqueViolationError
-from auth import hash_password,verify_password, create_token
+from auth import hash_password,verify_password, create_access_token,create_refresh_token,decode_token
 from auth import get_current_user
 from fastapi import Depends
 from fastapi import HTTPException
@@ -27,6 +27,7 @@ import logging
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -73,9 +74,7 @@ async def add_user_to_request(request: Request, call_next):
         auth_header = request.headers.get("Authorization")
 
         if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
-
-            from auth import decode_token
+            token = auth_header.split(" ")[1]  
             user = decode_token(token)
 
             if user:
@@ -124,15 +123,15 @@ async def startup_event():
     metrics_thread.start()
     
     app.state.checkpointer_cm = AsyncPostgresSaver.from_conn_string(
-        os.getenv("DATABASE_URL")
-    )
-    print(1)
+         os.getenv("DATABASE_URL")
+     )
     app.state.checkpointer = await app.state.checkpointer_cm.__aenter__()
 
-    # ✅ create chatbot
+    # # ✅ create chatbot
     await app.state.checkpointer.setup()
     chatbot = await create_chatbot(app.state.checkpointer)
-    print("insdie start up event")
+   
+  
     await init_db()          # ✅ initialize pool
     await create_tables()    # ✅ create schema   
 
@@ -140,6 +139,7 @@ async def startup_event():
 async def shutdown_event():
     await close_db()    
     await app.state.checkpointer_cm.__aexit__(None, None, None)
+    
 # =========================
 # Request / Response Models
 # =========================
@@ -246,10 +246,22 @@ async def login(request: Request, user: UserLogin):
                 logger.warning(f"Invalid password attempt for user: {user.username}")
                 raise HTTPException(status_code=401, detail="Invalid password")
 
-            token = create_token(user.username)
+            
+            access_token = create_access_token(user.username)
+            refresh_token = create_refresh_token(user.username)
+            response = JSONResponse(content={"access_token": access_token})
 
+        # 🍪 Store refresh token in cookie
+            response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=False,   # ⚠️ True in production (HTTPS)
+            samesite="lax",
+            max_age=7 * 24 * 60 * 60
+        )
             logger.info(f"User logged in: {user.username}")
-            return {"access_token": token}
+            return response
 
         except HTTPException:
             raise
@@ -265,8 +277,7 @@ async def login(request: Request, user: UserLogin):
 @app.post("/threads")
 @limiter.limit("4/minute")
 async def create_thread(request: Request, user: str = Depends(get_current_user)):
-    logger.info(f"Creating thread for user: {user}")
-
+    logger.info(f"Creating thread for user: {user}") 
     thread_id = generate_thread_id()
 
     try:
@@ -278,14 +289,14 @@ async def create_thread(request: Request, user: str = Depends(get_current_user))
                 user
             )
 
-        logger.info(f"Thread created: {thread_id}")
+        logger.info(f"Thread stored in db: {thread_id}")
 
         # ✅ Initialize chatbot state (non-blocking)
         await chatbot.ainvoke(
             {"messages": []},
             config=get_config(thread_id),
         )
-
+        logger.info(f"Thread created: {thread_id}")
         return ThreadResponse(thread_id=thread_id)
 
     except Exception as e:
@@ -411,3 +422,27 @@ async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get
 @app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok"}
+@app.post("/logout")
+async def logout():
+    response = JSONResponse(content={"message": "Logged out"})
+    response.delete_cookie("refresh_token")
+    return response
+
+@app.post("/refresh")
+async def refresh_token(request: Request):
+    try:
+        refresh_token = request.cookies.get("refresh_token")
+
+        if not refresh_token:
+            raise HTTPException(status_code=401, detail="No refresh token")
+
+        username = decode_token(refresh_token, expected_type="refresh")
+
+        new_access_token = create_access_token(username)
+
+        return {"access_token": new_access_token}
+
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=401, detail="Refresh failed")
