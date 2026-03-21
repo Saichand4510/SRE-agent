@@ -256,8 +256,8 @@ async def login(request: Request, user: UserLogin):
             key="refresh_token",
             value=refresh_token,
             httponly=True,
-            secure=False,   # ⚠️ True in production (HTTPS)
-            samesite="lax",
+            secure=True,   # ⚠️ True in production (HTTPS)
+            samesite="none",
             max_age=7 * 24 * 60 * 60
         )
             logger.info(f"User logged in: {user.username}")
