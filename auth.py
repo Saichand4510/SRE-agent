@@ -9,7 +9,8 @@ import os
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-
+ACCESS_EXPIRE_MINUTES = 15
+REFRESH_EXPIRE_DAYS = 7
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 pwd_context = CryptContext(schemes=["bcrypt"])
 
@@ -19,16 +20,27 @@ def hash_password(password: str):
 def verify_password(plain, hashed):
     return pwd_context.verify(plain, hashed)
 
-def create_token(username: str):
+def create_access_token(username: str):
     payload = {
         "sub": username,
-        "exp": datetime.utcnow() + timedelta(hours=1)
+        "type":"access",
+        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_EXPIRE_MINUTES)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
-def decode_token(token: str):
+def create_refresh_token(username: str):
+    payload = {
+        "sub": username,
+        "type": "refresh",
+        "exp": datetime.utcnow() + timedelta(days=REFRESH_EXPIRE_DAYS)
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+def decode_token(token: str, expected_type: str = "access"):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        if payload.get("type") != expected_type:
+            raise HTTPException(status_code=401, detail="Invalid token type")
+
         return payload["sub"]
 
     except ExpiredSignatureError:
