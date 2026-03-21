@@ -49,9 +49,8 @@ app = FastAPI(title="LangGraph MCP API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://sre-agent-1.onrender.com",
-    "https://65c3084a-9eb6-4ac7-84a6-497dd1423b2f.lovableproject.com",
-    "https://id-preview--65c3084a-9eb6-4ac7-84a6-497dd1423b2f.lovable.app"],  # Or specify your frontend URL
+    allow_origins=["https://chat-companion-07.onrender.com",
+        "http://localhost:8080",],  # Or specify your frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,15 +60,6 @@ def get_user_key(request):
 limiter = Limiter(key_func=get_user_key)
 
 app.state.limiter = limiter
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    logger.info(f"Request: {request.method} {request.url}")
-
-    response = await call_next(request)
-   
-    logger.info(f"Response: {response.status_code}")
-
-    return response
 @app.middleware("http")
 async def add_user_to_request(request: Request, call_next):
     try:
@@ -91,6 +81,16 @@ async def add_user_to_request(request: Request, call_next):
 
     response = await call_next(request)
     return response
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Request: {request.method} {request.url}")
+
+    response = await call_next(request)
+   
+    logger.info(f"Response: {response.status_code}")
+
+    return response
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled error: {str(exc)}")
@@ -105,12 +105,12 @@ async def rate_limit_handler(request, exc):
         content={"detail": "Too many requests"}
     )
 
-chatbot = None
+
 
 
 @app.on_event("startup")
 async def startup_event():
-    global chatbot
+   
 
     
 
@@ -131,7 +131,7 @@ async def startup_event():
 
     # # ✅ create chatbot
     await app.state.checkpointer.setup()
-    chatbot = await create_chatbot(app.state.checkpointer)
+    app.state.chatbot = await create_chatbot(app.state.checkpointer)
    
   
     await init_db()          # ✅ initialize pool
@@ -201,8 +201,7 @@ async def check_thread_owner(thread_id: str, user: str) -> bool:
     return result["username"] == user
 
 @app.post("/signup")
-@limiter.limit("5/minute", key_func=get_remote_address)
-async def signup(request: Request, user: UserSignup):
+async def signup( user: UserSignup):
     logger.info(f"Signup attempt: {user.username}")
 
     async with database.pool.acquire() as conn:
@@ -277,7 +276,7 @@ async def login(request: Request, user: UserLogin):
 
 
 @app.post("/threads")
-@limiter.limit("4/minute")
+@limiter.limit("20/minute")
 async def create_thread(request: Request, user: str = Depends(get_current_user)):
     logger.info(f"Creating thread for user: {user}") 
     thread_id = generate_thread_id()
@@ -291,13 +290,9 @@ async def create_thread(request: Request, user: str = Depends(get_current_user))
                 user
             )
 
-        logger.info(f"Thread stored in db: {thread_id}")
-
-        # ✅ Initialize chatbot state (non-blocking)
-        await chatbot.ainvoke(
-            {"messages": []},
-            config=get_config(thread_id),
-        )
+        
+      
+       
         logger.info(f"Thread created: {thread_id}")
         return ThreadResponse(thread_id=thread_id)
 
@@ -312,7 +307,7 @@ async def create_thread(request: Request, user: str = Depends(get_current_user))
 
 
 @app.get("/threads")
-@limiter.limit("2/minute")
+@limiter.limit("20/minute")
 async def list_threads(request: Request, user: str = Depends(get_current_user)):
     logger.info(f"Fetching threads for user: {user}")
 
@@ -337,14 +332,14 @@ async def list_threads(request: Request, user: str = Depends(get_current_user)):
 # =========================
 
 @app.get("/threads/{thread_id}")
-@limiter.limit("2/minute")
+@limiter.limit("20/minute")
 async def get_thread_messages(request:Request,thread_id: str, user: str = Depends(get_current_user)):
     try:
         logger.info(f"Fetching messages for thread: {thread_id} by user: {user}")
         if not await check_thread_owner(thread_id, user):
             logger.warning(f"Unauthorized access attempt: {thread_id} by {user}")
             raise HTTPException(status_code=403, detail="Not allowed")
-
+        chatbot=app.state.chatbot
         state = await chatbot.aget_state(
             config={"configurable": {"thread_id": thread_id}}
         )
@@ -376,7 +371,7 @@ async def get_thread_messages(request:Request,thread_id: str, user: str = Depend
 # =========================
 
 @app.post("/chat/stream")
-@limiter.limit("8/minute")
+@limiter.limit("15/minute")
 async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get_current_user)):
     if not await check_thread_owner(body.thread_id, user):
         logger.warning(f"Unauthorized chat access: {body.thread_id} by {user}")
@@ -386,7 +381,7 @@ async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get
     logger.info(f"Chat request from user: {user} on thread: {body.thread_id}")
     async def event_generator():
         try:
-            
+            chatbot=app.state.chatbot
             async for event in chatbot.astream_events(
                 {"messages": [HumanMessage(content=body.message)]},
                 config=CONFIG,
