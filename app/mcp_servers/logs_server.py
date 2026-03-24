@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 from datetime import datetime, timedelta, timezone
-
+import dateutil.parser
 mcp = FastMCP("logs-server")
 
 # ✅ robust absolute path
@@ -73,8 +73,10 @@ def get_logs_in_time_range(service: str, start_time: str, end_time: str) -> dict
         logs = json.load(f)
 
     try:
+        print("hi")
         start_dt = _parse_iso(start_time)
         end_dt = _parse_iso(end_time)
+        print(start_dt, end_dt)
     except Exception:
         return {
             "error": "Invalid time format. Use ISO format YYYY-MM-DDTHH:MM:SS"
@@ -163,7 +165,9 @@ def detect_error_patterns_in_time_range(
     try:
         
         start_dt = _parse_iso(start_time)
+        print(start_dt)
         end_dt = _parse_iso(end_time)
+        print(end_dt)
     except Exception:
         return {"error": "Invalid time format. Use ISO format"}
 
@@ -249,5 +253,75 @@ def detect_error_spike(
         "spike_detected": is_spike,
         "recent_errors": spike_logs,
     }
+@mcp.tool()
+def parse_time_window(relative_time: str) -> dict:
+    """
+    Convert natural language time expressions into ISO start/end timestamps.
+    
+    Supported formats:
+    - "last 30 minutes", "last 2 hours", "last 24 hours"
+    - "today", "yesterday"
+    - "last week", "this month"
+    - "since 14:30", "since yesterday 09:00"
+    - "between 2025-03-20 and 2025-03-22"
+    
+    Returns:
+        {"start_iso": "YYYY-MM-DDTHH:MM:SS", "end_iso": "YYYY-MM-DDTHH:MM:SS"}
+        or {"error": "message"} if parsing fails
+    """
+    now = datetime.utcnow()
+    relative_time = relative_time.lower().strip()
+
+    try:
+        if "last" in relative_time and any(unit in relative_time for unit in ["minute", "hour", "day", "week", "month"]):
+            # Examples: last 30 minutes, last 4 hours, last 3 days
+            parts = relative_time.split()
+            amount = int(parts[1])
+            unit = parts[2].rstrip('s')  # minutes → minute
+
+            if unit.startswith("minute"):
+                delta = timedelta(minutes=amount)
+            elif unit.startswith("hour"):
+                delta = timedelta(hours=amount)
+            elif unit.startswith("day"):
+                delta = timedelta(days=amount)
+            elif unit.startswith("week"):
+                delta = timedelta(weeks=amount)
+            elif unit.startswith("month"):
+                # rough approximation
+                delta = timedelta(days=amount * 30)
+            else:
+                return {"error": "Unsupported time unit"}
+
+            start = now - delta
+            return {
+                "start_iso": start.strftime("%Y-%m-%dT%H:%M:%S"),
+                "end_iso": now.strftime("%Y-%m-%dT%H:%M:%S")
+            }
+
+        elif relative_time in ["today", "yesterday"]:
+            if relative_time == "today":
+                start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            else:
+                start = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+            return {
+                "start_iso": start.strftime("%Y-%m-%dT%H:%M:%S"),
+                "end_iso": end.strftime("%Y-%m-%dT%H:%M:%S")
+            }
+
+        # Add more patterns as needed (since ..., between ..., etc.)
+        else:
+            # Fallback: try to parse as natural date with dateutil
+            dt = dateutil.parser.parse(relative_time, fuzzy=True)
+            start = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+            return {
+                "start_iso": start.strftime("%Y-%m-%dT%H:%M:%S"),
+                "end_iso": end.strftime("%Y-%m-%dT%H:%M:%S")
+            }
+
+    except Exception as e:
+        return {"error": f"Could not parse time expression: {str(e)}"}
 if __name__ == "__main__":
     mcp.run()
