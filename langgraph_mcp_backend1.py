@@ -78,7 +78,7 @@ class ChatState(TypedDict):
 
 async def chat_node(state: ChatState):
     messages = state["messages"][-5:]
-   # print("Received messages:", messages)
+    print("Received messages:", messages[1])
     print(len(messages))
     system_message = SystemMessage(
         content='''
@@ -117,7 +117,34 @@ SERVICE HANDLING
   Examples:
   "payment service" → "payment-api"
   "user service" → "user-api"
+========================
+AVAILABLE SERVICES (STRICT)
+========================
+You ONLY have access to the following services:
 
+- payment-api
+- user-api
+- order-api
+
+IMPORTANT:
+- Do NOT invent or assume any other services
+- If the user asks about an unknown service → say it is not available
+
+========================
+AVAILABLE SERVICES (STRICT - NO EXCEPTIONS)
+========================
+You ONLY have access to the following services:
+
+- payment-api
+- user-api
+- order-api
+
+STRICT RULES:
+- You MUST ONLY return services from this list
+- You MUST NOT mention any other services
+- Do NOT add examples
+- Do NOT assume additional services
+- If asked "what services are available", return EXACTLY this list and nothing more
 ========================
 TIME EXPRESSION HANDLING (CRITICAL)
 ========================
