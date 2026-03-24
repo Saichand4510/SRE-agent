@@ -11,7 +11,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 
 from langchain_core.messages import (
     BaseMessage,
-    SystemMessage,
+    SystemMessage,HumanMessage
 )
 from langchain_core.tools import BaseTool
 
@@ -62,7 +62,6 @@ client = MultiServerMCPClient(
 # ============================================================
 
 tools: List[BaseTool] = []
-llm_with_tools = llm
 chatbot = None
 
 # ============================================================
@@ -72,14 +71,44 @@ chatbot = None
 class ChatState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
 
+
+def get_last_turn_window(messages, num_turns=5):
+  
+
+    turns = []
+    current_turn = []
+
+    for msg in messages:
+        if isinstance(msg, HumanMessage):
+            if current_turn:
+                turns.append(current_turn)
+            current_turn = [msg]
+        else:
+            current_turn.append(msg)
+
+    if current_turn:
+        turns.append(current_turn)
+
+    last_turns = turns[-num_turns:]
+
+    window = [msg for turn in last_turns for msg in turn]
+
+    return window
+
+
 # ============================================================
 # 5️⃣ CHAT NODE
 # ============================================================
 
+
+
 async def chat_node(state: ChatState):
-    messages = state["messages"][-5:]
-    print("Received messages:", messages[1])
-    print(len(messages))
+    messages = state["messages"]
+    # print("Received messages:", messages)
+    window=get_last_turn_window(messages)
+   # print("Window:", window)
+    
+    # print(len(messages))
     system_message = SystemMessage(
         content='''
 You are an expert SRE (Site Reliability Engineering) investigation agent.
@@ -254,9 +283,12 @@ Good:
 
 Always base your answers strictly on tool outputs when available.'''
     )
+    # print("tools available in chat_node:")
+    # print(tools)
+    llm_with_tools = llm.bind_tools(tools)
 
     response = await llm_with_tools.ainvoke(
-        [system_message] + messages
+        [system_message] + window
     )
 
     return {"messages": [response]}
@@ -274,17 +306,16 @@ async def create_chatbot(checkpointer):
     - LangGraph
     """
 
-    global tools, llm_with_tools,  chatbot
+    global tools, chatbot
 
     # ✅ Load MCP tools
     try:
         tools = await client.get_tools()
-        #print(tools)
+        # print(tools)
     except Exception:
         tools = []
 
-    # ✅ Bind tools to LLM
-    llm_with_tools = llm.bind_tools(tools)
+   
    
     # ✅ Build graph
     graph = StateGraph(ChatState)
