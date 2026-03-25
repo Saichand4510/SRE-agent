@@ -146,18 +146,6 @@ SERVICE HANDLING
   Examples:
   "payment service" → "payment-api"
   "user service" → "user-api"
-========================
-AVAILABLE SERVICES (STRICT)
-========================
-You ONLY have access to the following services:
-
-- payment-api
-- user-api
-- order-api
-
-IMPORTANT:
-- Do NOT invent or assume any other services
-- If the user asks about an unknown service → say it is not available
 
 ========================
 AVAILABLE SERVICES (STRICT - NO EXCEPTIONS)
@@ -311,7 +299,7 @@ async def create_chatbot(checkpointer):
     # ✅ Load MCP tools
     try:
         tools = await client.get_tools()
-        # print(tools)
+      #  print(tools)
     except Exception:
         tools = []
 
