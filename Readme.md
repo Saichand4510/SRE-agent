@@ -1,21 +1,25 @@
 # SRE LangGraph MCP Agent
 
-An AI-powered **Site Reliability Engineering (SRE) investigation agent** that analyzes logs, metrics, and operational runbooks using **LangGraph, MCP servers, and LLM reasoning**.
+An AI-powered **Site Reliability Engineering (SRE) investigation agent**
+that analyzes logs, metrics, and operational runbooks using **LangGraph,
+MCP servers, and LLM reasoning**.
 
-This system simulates a real production environment where logs and metrics are continuously generated and the agent autonomously investigates system issues.
+This system simulates a real production environment where logs and
+metrics are continuously generated and the agent autonomously
+investigates system issues.
 
----
+------------------------------------------------------------------------
 
 # Architecture Overview
 
-The system follows a **multi-component architecture**.
+The system follows a **multi-component production-grade architecture**.
+
 
 ```
 User
  │
  ▼
-Streamlit Frontend
-(frontend_mcp.py)
+React frontend
  │
  ▼
 FastAPI Backend
@@ -49,7 +53,7 @@ MCP Client
 │   └──  logs / metrics files
 │
 ├── fastapibackend.py
-├── frontend_mcp.py
+├── Dockerfile
 ├── langgraph_mcp_backend1.py
 ├── log_generator.py
 ├── metrics_generator.py
@@ -59,352 +63,192 @@ MCP Client
 
 ---
 
+------------------------------------------------------------------------
+
+
 # Features
 
-* AI-powered incident investigation
-* Streaming LLM responses
-* Log analysis tools
-* Error spike detection
-* Metrics analysis
-* Runbook-based remediation suggestions
-* Thread-based chat sessions
-* Real-time telemetry simulation
+-   AI-powered incident investigation
+-   Streaming LLM responses
+-   Log analysis tools
+-   Error spike detection
+-   Metrics analysis
+-   Runbook-based remediation suggestions
+-   JWT Authentication (Access + Refresh Tokens)
+-   PostgreSQL storage
+-   Structured logging and error handling
+-   Rate limiting per user (API protection)
+-   Dockerized deployment (Render)
 
----
+------------------------------------------------------------------------
 
 # Tech Stack
 
-### Backend
+Backend: FastAPI, LangGraph, LangChain, MCP, PostgreSQL\
+Frontend: React\
+LLM: Groq (gpt-oss-120b)
 
-* FastAPI
-* LangGraph
-* LangChain
-* MCP (Model Context Protocol)
-* SQLite (chat state storage)
-
-### Frontend
-
-* Streamlit
-
-### LLM
-
-* Groq API (`openai/gpt-oss-120b`)
-
-### Other Libraries
-
-* aiosqlite
-* pydantic
-* python threading
-
----
+------------------------------------------------------------------------
 
 # System Workflow
 
-1. User sends a query via the Streamlit UI.
-2. The request is sent to the FastAPI backend.
-3. FastAPI forwards the request to the LangGraph agent.
-4. The agent determines which tools should be used.
-5. MCP servers execute the requested tools.
-6. Tool results are returned to the agent.
-7. The LLM interprets the results.
-8. The final response is streamed back to the user.
+1.  User sends a query via React UI\
+2.  JWT authentication\
+3.  Rate limiter validation\
+4.  FastAPI processes request\
+5.  LangGraph performs reasoning\
+6.  MCP tools execute\
+7.  LLM generates response\
+8.  Response is streamed back
 
----
+------------------------------------------------------------------------
 
-# Example Queries
+# Authentication Flow
 
-```
-Show logs for payment-api
-Detect error spike in order-api
-Check service health for user-api
-What errors occurred in the last 10 minutes?
-Suggest remediation for database connection timeout
-```
+User Login → Access + Refresh Token → Authenticated Requests → Token
+Refresh
 
----
+------------------------------------------------------------------------
 
-# Installation
+# Rate Limiting
 
-Clone the repository:
+Per-user rate limiting ensures fair usage, prevents abuse, and controls
+LLM cost.
 
-```
-git clone https://github.com/Saichand4510/SRE-agent.git
-cd SRE-agent
-```
-
-Create a virtual environment:
-
-```
-python -m venv agent
-```
-
-Activate the environment.
-
-### Windows
-
-```
-agent\Scripts\activate
-```
-
-### Linux / Mac
-
-```
-source agent/bin/activate
-```
-
-Install dependencies:
-
-```
-pip install -r requirements.txt
-```
-
----
-
-# Environment Variables
-
-Create a `.env` file in the project root:
-
-```
-GROQ_API_KEY=your_api_key
-```
-
----
-
-# Running the Backend
-
-Start the FastAPI server:
-
-```
-uvicorn fastapibackend:app --reload
-```
-
-When the backend starts it automatically:
-
-* initializes the LangGraph agent
-* starts the log generator thread
-* starts the metrics generator thread
-* launches MCP servers
-
----
-
-# Running the Frontend
-
-Start the Streamlit UI:
-
-```
-streamlit run frontend_mcp.py
-```
-
-Then open the browser URL shown in the terminal.
-
----
-
-# Streaming Architecture
-
-The system streams responses using **FastAPI StreamingResponse**.
-
-```
-User Query
-   │
-   ▼
-LangGraph Agent
-   │
-   ▼
-Tool Execution Events
-   │
-   ▼
-LLM Token Streaming
-   │
-   ▼
-Streamlit UI Updates
-```
-
-This allows the user to see responses **in real-time**.
-
----
+------------------------------------------------------------------------
 
 # System Design Explanation
 
-This project implements an **AI-powered SRE investigation agent** capable of analyzing operational telemetry.
+This project implements an **AI-powered SRE investigation agent**
+capable of analyzing operational telemetry.
 
-The system separates responsibilities across multiple layers to ensure modularity and scalability.
-
----
+------------------------------------------------------------------------
 
 ## API Layer (FastAPI)
 
-FastAPI acts as the **entry point** of the system.
+-   authentication & authorization\
+-   rate limiting\
+-   request handling\
+-   streaming responses\
+-   LangGraph coordination
 
-Responsibilities:
-
-* manage chat threads
-* stream responses
-* coordinate LangGraph execution
-* start telemetry generators
-
-FastAPI uses **asynchronous request handling** to support multiple users.
-
----
+------------------------------------------------------------------------
 
 ## Agent Layer (LangGraph)
 
-LangGraph acts as the **reasoning engine**.
+-   reasoning engine\
+-   tool selection\
+-   multi-step investigation\
+-   response synthesis
 
-The agent:
-
-* interprets user queries
-* selects appropriate tools
-* performs multi-step investigations
-* combines tool outputs into a final explanation
-
-Investigation flow:
-
-```
-User Query
-   │
-   ▼
-LLM Reasoning
-   │
-   ▼
-Tool Selection
-   │
-   ▼
-Tool Execution
-   │
-   ▼
-Result Analysis
-   │
-   ▼
-Final Response
-```
-
----
+------------------------------------------------------------------------
 
 ## MCP Tool Layer
 
-The agent interacts with system tools via **Model Context Protocol (MCP)**.
-
-Each MCP server provides specialized capabilities.
-
 ### Logs MCP Server
 
-Provides log investigation features:
-
-* log retrieval
-* error pattern detection
-* spike detection
-* time window filtering
-
----
+-   log retrieval\
+-   error detection\
+-   spike detection
 
 ### Metrics MCP Server
 
-Provides performance insights:
-
-* latency analysis
-* CPU usage
-* memory usage
-* service health checks
-
----
+-   latency\
+-   CPU usage\
+-   memory usage
 
 ### RAG MCP Server
 
-Provides remediation suggestions based on operational runbooks.
+-   remediation suggestions\
+-   runbook-based insights
 
-This allows the system to recommend:
-
-* root causes
-* mitigation strategies
-* operational procedures
-
----
+------------------------------------------------------------------------
 
 # Telemetry Simulation
 
-To simulate a real production environment, background generators produce system signals.
-
 ### Log Generator
 
-Continuously produces logs such as:
-
-* INFO events
-* WARN events
-* ERROR spikes
-
----
+-   INFO / WARN / ERROR logs
 
 ### Metrics Generator
 
-Continuously generates metrics:
+-   latency\
+-   error rate\
+-   CPU\
+-   memory
 
-* latency
-* error rate
-* CPU usage
-* memory usage
-
----
+------------------------------------------------------------------------
 
 # Concurrency Model
 
-The system combines multiple concurrency techniques.
+-   async FastAPI event loop\
+-   background threads\
+-   MCP processes for isolation
 
-### Async API Server
+------------------------------------------------------------------------
 
-FastAPI handles multiple requests concurrently using an **async event loop**.
+# Installation
 
----
+git clone https://github.com/Saichand4510/SRE-agent.git cd SRE-agent
+python -m venv agent
 
-### Background Threads
+### Activate
 
-Two threads simulate telemetry:
+Windows: agent`\Scripts`{=tex}`\activate`{=tex}
 
-* log generator thread
-* metrics generator thread
+Linux / Mac: source agent/bin/activate
 
----
+### Install
 
-### MCP Child Processes
+pip install -r requirements.txt
 
-Each MCP server runs as a **separate process** launched by the MCP client.
+------------------------------------------------------------------------
 
-This provides:
+# Environment Variables
 
-* isolation
-* parallel tool execution
-* modular architecture
+GROQ_API_KEY=your_api_key DATABASE_URL=your_postgresql_url
+JWT_SECRET=your_secret_key
 
----
+------------------------------------------------------------------------
+
+# Running the Backend
+
+uvicorn fastapibackend:app --reload
+
+------------------------------------------------------------------------
+
+# Running the Frontend
+
+npm install npm start
+
+------------------------------------------------------------------------
 
 # Deployment
 
-This project can be deployed on:
+Deployed on **Render using Docker**.
 
-* Render
-* Railway
-* AWS
-* Google Cloud
+-   containerized application\
+-   environment variable management\
+-   scalable deployment
 
-Recommended configuration:
+------------------------------------------------------------------------
 
-```
-WEB_CONCURRENCY=1
-```
+# Future Enhancements
 
----
+## Redis Caching
+
+-   cache responses\
+-   reduce database load\
+-   improve latency
+
+## LLM Efficiency
+
+-   reduce token usage\
+-   optimize prompts\
+-   support self-hosted models (vLLM)
+
+------------------------------------------------------------------------
 
 # Author
 
-**Saichand Linga**
-
----
-
-# Notes
-
-This project demonstrates:
-
-* AI agent architecture
-* observability tooling
-* distributed tool orchestration
-* streaming AI interfaces
-* production-style system design
+Saichand Linga
