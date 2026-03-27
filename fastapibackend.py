@@ -1,3 +1,4 @@
+import time
 import uuid
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
@@ -8,7 +9,7 @@ import threading
 from log_generator import main as start_log_generator
 from metrics_generator import main as start_metrics_generator
 from langgraph_mcp_backend1 import (
-    create_chatbot
+    create_chatbot,client
    
 )
 from database import create_tables,init_db,close_db
@@ -27,8 +28,54 @@ import logging
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+# from latency_logger import log_latency
+import asyncio
+import hashlib
+from contextlib import AsyncExitStack
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 
+class CheckpointerPool:
+    def __init__(self, db_url: str, size: int = 5):
+        self.db_url = db_url
+        self.size = size
+        self._checkpointers = []
+        self._exit_stack = AsyncExitStack()
+        self._locks = []  # 🔒 one lock per checkpointer
+
+    async def startup(self):
+        for i in range(self.size):
+            cm = AsyncPostgresSaver.from_conn_string(self.db_url)
+            cp = await self._exit_stack.enter_async_context(cm)
+            if i==0:
+             await cp.setup()
+            print("Checkpointer initialized") 
+            self._checkpointers.append(cp)
+            self._locks.append(asyncio.Semaphore(1))  # 🔒 only 1 request at a time
+
+    async def shutdown(self):
+        print("Shutting down checkpointer pool...")
+        await self._exit_stack.aclose()
+
+    def _hash(self, key: str) -> int:
+        return int(hashlib.sha256(key.encode()).hexdigest(), 16)
+
+    async def acquire(self, key: str):
+        """
+        Get a checkpointer safely (with lock)
+        """
+        idx = self._hash(key) % self.size
+        await self._locks[idx].acquire()  # 🔒 wait if busy
+        print(f"Acquired checkpointer {idx} for key: {key}")  
+        return idx, self._checkpointers[idx]
+
+    def release(self, idx: int):
+        """
+        Release the lock after request completes
+        """
+        print(f"Releasing checkpointer {idx}")
+        self._locks[idx].release()
+        # pass
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s",
@@ -67,6 +114,7 @@ async def add_user_to_request(request: Request, call_next):
 
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]  
+            print(token)
             user = decode_token(token)
 
             if user:
@@ -124,14 +172,18 @@ async def startup_event():
     metrics_thread.daemon = True
     metrics_thread.start()
     
-    app.state.checkpointer_cm = AsyncPostgresSaver.from_conn_string(
-         os.getenv("DATABASE_URL")
-     )
-    app.state.checkpointer = await app.state.checkpointer_cm.__aenter__()
-
-    # # ✅ create chatbot
-    await app.state.checkpointer.setup()
-    app.state.chatbot = await create_chatbot(app.state.checkpointer)
+    app.state.cp_pool = CheckpointerPool(
+        db_url=os.getenv("DATABASE_URL"),
+        size=5  # tune this
+    )
+    try:
+      app.state.tools=await client.get_tools()
+    except Exception as e:
+        logger.error(f"Error fetching tools: {repr(e)}")
+        app.state.tools = []
+    await app.state.cp_pool.startup()
+    app.state.chatbots = {}
+    app.state.llm_sem = asyncio.Semaphore(2)  # 🔒 limit concurrent LLM calls
    
   
     await init_db()          # ✅ initialize pool
@@ -140,7 +192,7 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     await close_db()    
-    await app.state.checkpointer_cm.__aexit__(None, None, None)
+    await app.state.cp_pool.shutdown()
     
 # =========================
 # Request / Response Models
@@ -185,8 +237,47 @@ def get_config(thread_id: str):
         "metadata": {"thread_id": thread_id},
         "run_name": "chat_turn",
     }
+async def is_cp_alive(cp):
+    try:
+        result=await cp.conn.execute("SELECT 1")
+        print(f"CP health check result: {result}")  # Debug log
+        return True
+    except Exception:
+        return False
 
+async def get_chatbot(app, user_id: str):
+    cp_pool = app.state.cp_pool
 
+    idx, cp = await cp_pool.acquire(user_id)
+
+    key = idx
+    tools=app.state.tools
+    # 🔥 CHECK CONNECTION HEALTH
+    if not await is_cp_alive(cp):
+        print(f"Recreating CP {idx} while lock held")
+        
+        # recreate checkpointer
+        cm = AsyncPostgresSaver.from_conn_string(app.state.cp_pool.db_url)
+        new_cp = await app.state.cp_pool._exit_stack.enter_async_context(cm)
+        await new_cp.setup()
+
+        # replace in pool
+        app.state.cp_pool._checkpointers[idx] = new_cp
+        cp = new_cp
+
+        # ❗ IMPORTANT: also update chatbot
+        if key in app.state.chatbots:
+            print(f"Rebinding chatbot {key} to new CP")
+
+            # recreate chatbot ONLY when cp is dead
+            app.state.chatbots[key] = await create_chatbot(cp,tools)
+
+    # normal creation
+    if key not in app.state.chatbots:
+        print(f"Creating chatbot for key: {key}")
+        app.state.chatbots[key] = await create_chatbot(cp,tools)
+
+    return key, app.state.chatbots[key]
 
 async def check_thread_owner(thread_id: str, user: str) -> bool:
     async with database.pool.acquire() as conn:
@@ -297,7 +388,7 @@ async def create_thread(request: Request, user: str = Depends(get_current_user))
         return ThreadResponse(thread_id=thread_id)
 
     except Exception as e:
-        logger.error(f"Thread creation failed: {str(e)}")
+        logger.error(f"Thread creation failed: {repr(e)}")
         raise HTTPException(status_code=500, detail="Failed to create thread")
 
 
@@ -334,12 +425,15 @@ async def list_threads(request: Request, user: str = Depends(get_current_user)):
 @app.get("/threads/{thread_id}")
 @limiter.limit("20/minute")
 async def get_thread_messages(request:Request,thread_id: str, user: str = Depends(get_current_user)):
+    idx=None
     try:
         logger.info(f"Fetching messages for thread: {thread_id} by user: {user}")
         if not await check_thread_owner(thread_id, user):
             logger.warning(f"Unauthorized access attempt: {thread_id} by {user}")
             raise HTTPException(status_code=403, detail="Not allowed")
-        chatbot=app.state.chatbot
+        
+        key=f"{user}:{thread_id}"
+        idx, chatbot = await get_chatbot(app, key)
         state = await chatbot.aget_state(
             config={"configurable": {"thread_id": thread_id}}
         )
@@ -362,8 +456,11 @@ async def get_thread_messages(request:Request,thread_id: str, user: str = Depend
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Fetch messages error: {str(e)}")
+        logger.error(f"Fetch messages error: {repr(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch messages")
+    finally:
+        if idx is not None:
+         app.state.cp_pool.release(idx)    # 🔒 release checkpointer
 
 
 # =========================
@@ -371,49 +468,123 @@ async def get_thread_messages(request:Request,thread_id: str, user: str = Depend
 # =========================
 
 @app.post("/chat/stream")
-@limiter.limit("15/minute")
+@limiter.limit("20/minute")
 async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get_current_user)):
+    idx=None
     if not await check_thread_owner(body.thread_id, user):
         logger.warning(f"Unauthorized chat access: {body.thread_id} by {user}")
         raise HTTPException(status_code=403, detail="Not allowed")
-
+    
+    key=f"{user}:{body.thread_id}"
+    idx, chatbot = await get_chatbot(app, key)
+    print(f"Using checkpointer {idx} for user {user} and thread {body.thread_id}")  # Debug log
     CONFIG = get_config(body.thread_id)
     logger.info(f"Chat request from user: {user} on thread: {body.thread_id}")
     async def event_generator():
-        try:
-            chatbot=app.state.chatbot
+        start_time = time.time()
+        first_token_time = None
+        tool_start_time = None
+        total_tool_time = 0
+
+        request_id = str(uuid.uuid4())
+        
+        try:  
+           async with app.state.llm_sem:  # 🔒 limit concurrent LLM calls 
             async for event in chatbot.astream_events(
                 {"messages": [HumanMessage(content=body.message)]},
                 config=CONFIG,
                 
             ):
                 event_type = event["event"]
-
+                
                 if event_type == "on_tool_start":
+                    # print(f"Tool started: {event['name']}")  # Debug log
+                    tool_start_time = time.time()
                     yield json.dumps({
                         "type": "tool_start",
                         "name": event["name"]
                     }) + "\n"
+                    # yield f"data: {json.dumps({ "type": "tool_start",
+                    #    "name": event["name"]})}\n\n"
+                    
 
                 elif event_type == "on_tool_end":
+                    #raw_output = event.get("data", {}).get("output", "")
+
+# extract text properly
+                    # if hasattr(raw_output, "content"):
+                    #       if isinstance(raw_output.content, list):
+                    #                output = "\n".join(
+                    #                  item.get("text", "") for item in raw_output.content if isinstance(item, dict)
+                    #                     )
+                    #       else:
+                    #             output = str(raw_output.content)
+                    # else:
+                    #      output = str(raw_output)
+                    # print(f"Tool ended: {event['name']} with output: {output}")  # Debug log
+                    if tool_start_time:
+                       total_tool_time += time.time() - tool_start_time
                     yield json.dumps({
                         "type": "tool_end"
+                        # "output": output
                     }) + "\n"
+                    # yield f"data: {json.dumps({ "type": "tool_end"})}\n\n"
 
                 elif event_type == "on_chat_model_stream":
                     chunk = event["data"]["chunk"]
+                  #  print(f"Received chunk: {chunk.content}")  # Debug log
                     if chunk.content:
+                        if first_token_time is None:
+                           first_token_time = time.time()
                         yield json.dumps({
                             "type": "assistant",
                             "content": chunk.content
                         }) + "\n"
+                        # print(f"Yielding chunk: {chunk.content}")  # Debug log
+                       # yield f"data: {json.dumps({ 'type': 'assistant', 'content': chunk.content})}\n\n"
 
-        except Exception:
-            logger.info(f"Chat request from user: {user} on thread: {body.thread_id}")
+            end_time = time.time()    
+            metrics = {
+            "request_id": request_id,
+            "user": user,
+            "query": body.message,
+            "thread_id": body.thread_id,
+            "total_latency": end_time - start_time,
+            "ttft": (first_token_time - start_time) if first_token_time else None,
+            "tool_latency": total_tool_time,
+            "llm_latency": (end_time - start_time) - total_tool_time,
+            "status": "success",
+        }
+
+            # log_latency(metrics)
+
+            # print("📊 LATENCY:", metrics)  
+
+        except Exception as e:
+            end_time = time.time()
+
+            metrics = {
+            "request_id": request_id,
+            "user": user,
+            "query": body.message,
+            "thread_id": body.thread_id,
+            "total_latency": end_time - start_time,
+            "status": "failure",
+            "error": str(e),
+        }
+
+            log_latency(metrics)
+            logger.error(f"Chat error: {repr(e)}")
             yield json.dumps({
                 "type": "error",
                 "message": "Chat failed"
+        
             }) + "\n"
+
+        finally:
+            # 🔒 release checkpointer
+            if idx is not None:
+             app.state.cp_pool.release(idx)    
 
     return StreamingResponse(event_generator(), media_type="text/plain")
 @app.api_route("/health", methods=["GET", "HEAD"])
