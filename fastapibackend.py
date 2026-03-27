@@ -573,7 +573,7 @@ async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get
             "error": str(e),
         }
 
-            log_latency(metrics)
+            # log_latency(metrics)
             logger.error(f"Chat error: {repr(e)}")
             yield json.dumps({
                 "type": "error",
