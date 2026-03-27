@@ -17,7 +17,7 @@ from langchain_core.tools import BaseTool
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_groq import ChatGroq
-from fastapibackend import app
+
 load_dotenv()
 
 # ============================================================
@@ -60,7 +60,7 @@ client = MultiServerMCPClient(
 # 3️⃣ GLOBAL RUNTIME STATE (initialized at startup)
 # ============================================================
 
-
+tools: List[BaseTool] = []
 chatbot = None
 
 # ============================================================
@@ -272,7 +272,7 @@ Always base your answers strictly on tool outputs when available.'''
     )
     # print("tools available in chat_node:")
     # print(tools)
-    llm_with_tools = llm.bind_tools(app.state.tools)
+    llm_with_tools = llm.bind_tools(tools)
 
     response = await llm_with_tools.ainvoke(
         [system_message] + window
@@ -284,7 +284,7 @@ Always base your answers strictly on tool outputs when available.'''
 # 6️⃣ CHATBOT FACTORY (CALLED BY FASTAPI STARTUP)
 # ============================================================
 
-async def create_chatbot(checkpointer,tools):
+async def create_chatbot(checkpointer):
     """
     Initializes:
     - MCP tools
@@ -293,8 +293,13 @@ async def create_chatbot(checkpointer,tools):
     - LangGraph
     """
 
-    global  chatbot
-
+    global  chatbot,tools
+   
+    try:
+        tools=await client.get_tools()
+    except Exception as e:
+        print(f"Error loading tools: {e}")
+        tools=None
     # ✅ Load MCP tools
    
 

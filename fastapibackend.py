@@ -49,12 +49,12 @@ class CheckpointerPool:
             cp = await self._exit_stack.enter_async_context(cm)
             if i==0:
              await cp.setup()
-            print("Checkpointer initialized") 
+            # print("Checkpointer initialized") 
             self._checkpointers.append(cp)
             self._locks.append(asyncio.Semaphore(1))  # 🔒 only 1 request at a time
 
     async def shutdown(self):
-        print("Shutting down checkpointer pool...")
+        # print("Shutting down checkpointer pool...")
         await self._exit_stack.aclose()
 
     def _hash(self, key: str) -> int:
@@ -66,14 +66,14 @@ class CheckpointerPool:
         """
         idx = self._hash(key) % self.size
         await self._locks[idx].acquire()  # 🔒 wait if busy
-        print(f"Acquired checkpointer {idx} for key: {key}")  
+        # print(f"Acquired checkpointer {idx} for key: {key}")  
         return idx, self._checkpointers[idx]
 
     def release(self, idx: int):
         """
         Release the lock after request completes
         """
-        print(f"Releasing checkpointer {idx}")
+        # print(f"Releasing checkpointer {idx}")
         self._locks[idx].release()
         # pass
 logging.basicConfig(
@@ -176,11 +176,7 @@ async def startup_event():
         db_url=os.getenv("DATABASE_URL"),
         size=5  # tune this
     )
-    try:
-      app.state.tools=await client.get_tools()
-    except Exception as e:
-        logger.error(f"Error fetching tools: {repr(e)}")
-        app.state.tools = []
+  
     await app.state.cp_pool.startup()
     app.state.chatbots = {}
     app.state.llm_sem = asyncio.Semaphore(2)  # 🔒 limit concurrent LLM calls
@@ -240,7 +236,7 @@ def get_config(thread_id: str):
 async def is_cp_alive(cp):
     try:
         result=await cp.conn.execute("SELECT 1")
-        print(f"CP health check result: {result}")  # Debug log
+        # print(f"CP health check result: {result}")  # Debug log
         return True
     except Exception:
         return False
@@ -251,10 +247,10 @@ async def get_chatbot(app, user_id: str):
     idx, cp = await cp_pool.acquire(user_id)
 
     key = idx
-    tools=app.state.tools
+    
     # 🔥 CHECK CONNECTION HEALTH
     if not await is_cp_alive(cp):
-        print(f"Recreating CP {idx} while lock held")
+        # print(f"Recreating CP {idx} while lock held")
         
         # recreate checkpointer
         cm = AsyncPostgresSaver.from_conn_string(app.state.cp_pool.db_url)
@@ -267,15 +263,15 @@ async def get_chatbot(app, user_id: str):
 
         # ❗ IMPORTANT: also update chatbot
         if key in app.state.chatbots:
-            print(f"Rebinding chatbot {key} to new CP")
+            # print(f"Rebinding chatbot {key} to new CP")
 
             # recreate chatbot ONLY when cp is dead
-            app.state.chatbots[key] = await create_chatbot(cp,tools)
+            app.state.chatbots[key] = await create_chatbot(cp)
 
     # normal creation
     if key not in app.state.chatbots:
-        print(f"Creating chatbot for key: {key}")
-        app.state.chatbots[key] = await create_chatbot(cp,tools)
+        # print(f"Creating chatbot for key: {key}")
+        app.state.chatbots[key] = await create_chatbot(cp)
 
     return key, app.state.chatbots[key]
 
@@ -477,7 +473,7 @@ async def chat_stream(request:Request,body: ChatRequest, user: str = Depends(get
     
     key=f"{user}:{body.thread_id}"
     idx, chatbot = await get_chatbot(app, key)
-    print(f"Using checkpointer {idx} for user {user} and thread {body.thread_id}")  # Debug log
+    # print(f"Using checkpointer {idx} for user {user} and thread {body.thread_id}")  # Debug log
     CONFIG = get_config(body.thread_id)
     logger.info(f"Chat request from user: {user} on thread: {body.thread_id}")
     async def event_generator():
